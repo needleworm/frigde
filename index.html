@@ -10,7 +10,7 @@
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -27,7 +27,7 @@
 <body>
   <div class="app-wrapper">
     
-    <!-- Top Header -->
+    <!-- Slim Header -->
     <header class="app-header">
       <div class="header-container">
         <div class="brand">
@@ -36,22 +36,22 @@
           </div>
           <div class="brand-text">
             <h1>ExcelSchema<span class="brand-accent">Merger</span></h1>
-            <p class="brand-subtitle">스마트 엑셀 규격별 자동 병합기</p>
+            <span class="brand-badge"><i data-lucide="shield-check"></i> 로컬 안전 처리</span>
           </div>
         </div>
 
         <div class="header-actions">
-          <button id="btn-sample-demo" class="btn btn-outline" title="테스트용 예제 엑셀 파일들을 자동 생성하여 즉시 테스트합니다">
+          <button id="btn-sample-demo" class="btn btn-sm btn-outline" title="테스트용 예제 엑셀 파일들을 자동 생성하여 즉시 테스트합니다">
             <i data-lucide="sparkles"></i>
-            <span>샘플 데이터로 즉시 체험</span>
+            <span>샘플 데이터 체험</span>
           </button>
           
-          <button id="btn-theme-toggle" class="btn-icon" title="테마 전환 (다크/라이트)" aria-label="테마 전환">
+          <button id="btn-theme-toggle" class="btn-icon btn-sm" title="테마 전환 (다크/라이트)" aria-label="테마 전환">
             <i data-lucide="sun" class="icon-sun"></i>
             <i data-lucide="moon" class="icon-moon"></i>
           </button>
 
-          <button id="btn-reset-all" class="btn btn-ghost text-danger" title="전체 초기화" style="display: none;">
+          <button id="btn-reset-all" class="btn btn-sm btn-ghost text-danger" title="전체 초기화" style="display: none;">
             <i data-lucide="rotate-ccw"></i>
             <span>초기화</span>
           </button>
@@ -61,268 +61,186 @@
 
     <!-- Main Content Container -->
     <main class="main-container">
-      
-      <!-- Top Alert / Introduction Banner -->
-      <section class="hero-card">
-        <div class="hero-content">
-          <div class="hero-badge-row">
-            <span class="badge badge-pill badge-gradient"><i data-lucide="zap"></i> No Server &bull; 100% 브라우저 로컬 안전 처리</span>
-            <span class="badge badge-pill badge-neutral"><i data-lucide="file-check"></i> .xlsx, .xls, .csv 지원</span>
-          </div>
-          <h2>서로 다른 규격의 엑셀 파일들을 스마트하게 한 번에 정리하세요</h2>
-          <p>
-            여러 개의 엑셀 파일을 업로드하면 <strong>헤더(열 구성)를 정밀 분석</strong>하여 
-            동일한 규격을 가진 파일끼리 자동으로 묶어 병합해 드립니다. 열 순서가 달라도 알아서 척척 맞춰집니다.
-          </p>
-        </div>
-      </section>
 
-      <!-- Step 1: Upload & Option Section -->
-      <section class="section-card upload-section" id="upload-section">
-        <div class="drop-zone" id="drop-zone">
+      <!-- Compact Upload & Options Card -->
+      <section class="section-card upload-compact-card" id="upload-section">
+        
+        <!-- Slim Drop Zone -->
+        <div class="drop-zone-compact" id="drop-zone">
           <input type="file" id="file-input" multiple accept=".xlsx, .xls, .csv" class="file-input-hidden">
-          
-          <div class="drop-zone-content">
-            <div class="upload-illustration">
-              <div class="icon-circle">
-                <i data-lucide="file-spreadsheet" class="main-upload-icon"></i>
-              </div>
-              <div class="floating-badge badge-1"><i data-lucide="file-check"></i> .xlsx</div>
-              <div class="floating-badge badge-2"><i data-lucide="file-text"></i> .csv</div>
-              <div class="floating-badge badge-3"><i data-lucide="table"></i> .xls</div>
+          <div class="drop-compact-content">
+            <div class="drop-icon-wrap">
+              <i data-lucide="file-spreadsheet"></i>
             </div>
-
-            <h3>엑셀 파일들을 이곳에 끌어다 놓으세요</h3>
-            <p class="drop-desc">또는 아래 버튼을 눌러 여러 파일을 한 번에 선택할 수 있습니다</p>
-            
-            <div class="upload-btn-group">
-              <label for="file-input" class="btn btn-primary btn-lg cursor-pointer">
-                <i data-lucide="folder-open"></i>
-                <span>내 컴퓨터에서 파일 선택</span>
-              </label>
+            <div class="drop-texts">
+              <span class="drop-main-text"><strong>엑셀 파일들을 이곳에 끌어다 놓거나 클릭하여 선택하세요</strong></span>
+              <span class="drop-sub-text">.xlsx, .xls, .csv 지원 &bull; 여러 파일을 한 번에 넣어도 열 규격별로 자동 분류됩니다</span>
             </div>
-            
-            <div class="upload-hint">
-              <i data-lucide="info"></i>
-              <span>수십, 수백 개의 파일을 한꺼번에 넣어도 헤더 규격별로 알아서 분류됩니다.</span>
+            <div class="drop-badge-group">
+              <span class="badge badge-neutral"><i data-lucide="plus"></i> 파일 선택</span>
             </div>
           </div>
 
           <!-- Upload Loading / Parsing Overlay -->
           <div class="parsing-overlay" id="parsing-overlay" style="display: none;">
             <div class="spinner"></div>
-            <h4 id="parsing-status-title">파일 분석 중...</h4>
-            <p id="parsing-status-desc">헤더 및 데이터 스키마를 판독하고 있습니다</p>
+            <div class="parsing-text-wrap">
+              <h4 id="parsing-status-title">파일 분석 중...</h4>
+              <p id="parsing-status-desc">헤더 및 데이터 스키마를 판독하고 있습니다</p>
+            </div>
             <div class="progress-bar-container">
               <div class="progress-bar" id="parsing-progress-bar" style="width: 0%;"></div>
             </div>
           </div>
         </div>
 
-        <!-- Merge Settings Panel -->
-        <div class="settings-panel">
-          <div class="settings-header" id="settings-toggle-trigger">
-            <h4><i data-lucide="sliders"></i> 병합 및 분류 정밀 옵션 설정</h4>
+        <!-- Quick Options Bar (Compact & Collapsible) -->
+        <div class="compact-options-bar">
+          <div class="options-summary-row" id="settings-toggle-trigger">
+            <div class="options-summary-left">
+              <i data-lucide="sliders" class="icon-sliders"></i>
+              <span class="options-title">병합 및 분류 설정</span>
+              <div class="quick-chips-preview">
+                <span class="chip-mini">순서 무관 유연 일치</span>
+                <span class="chip-mini">_원본파일명 추가</span>
+                <span class="chip-mini">빈 행 제외</span>
+              </div>
+            </div>
             <button type="button" class="btn-text-toggle" id="btn-toggle-settings">
-              <span id="settings-toggle-text">상세 옵션 접기</span>
-              <i data-lucide="chevron-up" id="settings-chevron"></i>
+              <span id="settings-toggle-text">설정 펼치기</span>
+              <i data-lucide="chevron-down" id="settings-chevron"></i>
             </button>
           </div>
 
-          <div class="settings-grid" id="settings-content">
-            <!-- Setting: Match Criteria -->
+          <!-- Expanded Settings Grid (Hidden by default to save space) -->
+          <div class="settings-compact-grid" id="settings-content" style="display: none;">
             <div class="setting-item">
-              <label class="setting-label" for="opt-match-mode">
-                <span>규격 일치 기준 (열 매칭 방식)</span>
-                <span class="tooltip-icon" title="열 이름 집합이 같으면 순서가 달라도 같은 규격으로 묶을지 선택합니다."><i data-lucide="help-circle"></i></span>
-              </label>
+              <label class="setting-label" for="opt-match-mode">열 매칭 방식</label>
               <select id="opt-match-mode" class="custom-select">
                 <option value="flexible" selected>유연 일치 (열 순서 무관 / 권장)</option>
                 <option value="strict">엄격 일치 (열 순서까지 완벽 일치)</option>
               </select>
             </div>
 
-            <!-- Setting: Header Row Index -->
             <div class="setting-item">
-              <label class="setting-label" for="opt-header-row">
-                <span>헤더(컬럼명) 위치 행</span>
-                <span class="tooltip-icon" title="헤더 컬럼명이 위치한 행 번호입니다."><i data-lucide="help-circle"></i></span>
-              </label>
+              <label class="setting-label" for="opt-header-row">헤더 시작 행</label>
               <select id="opt-header-row" class="custom-select">
                 <option value="1" selected>1번째 행 (기본값)</option>
-                <option value="auto">자동 감지 (상단 빈 행 자동 건너뛰기)</option>
+                <option value="auto">자동 감지 (상단 빈 행 제외)</option>
                 <option value="2">2번째 행</option>
                 <option value="3">3번째 행</option>
-                <option value="4">4번째 행</option>
               </select>
             </div>
 
-            <!-- Setting: Multi-sheet Mode -->
             <div class="setting-item">
-              <label class="setting-label" for="opt-sheet-mode">
-                <span>다중 시트 파일 처리 방식</span>
-                <span class="tooltip-icon" title="1개 엑셀 파일에 시트가 여러 개 있을 때의 처리 방법입니다."><i data-lucide="help-circle"></i></span>
-              </label>
+              <label class="setting-label" for="opt-sheet-mode">다중 시트 처리</label>
               <select id="opt-sheet-mode" class="custom-select">
                 <option value="first" selected>첫 번째 시트만 사용</option>
-                <option value="all">모든 시트를 각각 규격 분석</option>
+                <option value="all">모든 시트 각각 규격 분석</option>
               </select>
             </div>
 
-            <!-- Setting: Add Source File Column -->
-            <div class="setting-item checkbox-item">
+            <div class="setting-item-inline">
               <label class="custom-checkbox">
                 <input type="checkbox" id="opt-add-filename" checked>
                 <span class="checkmark"></span>
-                <span class="checkbox-text">
-                  <strong>출처 파일명 열 추가 (<code>_원본파일명</code>)</strong>
-                  <small>각 데이터가 어느 파일에서 왔는지 맨 앞 열에 기록합니다</small>
-                </span>
+                <span class="checkbox-label"><code>_원본파일명</code> 열 추가</span>
               </label>
-            </div>
 
-            <!-- Setting: Add Source Sheet Column -->
-            <div class="setting-item checkbox-item">
               <label class="custom-checkbox">
                 <input type="checkbox" id="opt-add-sheetname">
                 <span class="checkmark"></span>
-                <span class="checkbox-text">
-                  <strong>출처 시트명 열 추가 (<code>_시트명</code>)</strong>
-                  <small>시트명이 중요한 경우 원본 시트명을 기록합니다</small>
-                </span>
+                <span class="checkbox-label"><code>_시트명</code> 열 추가</span>
               </label>
-            </div>
 
-            <!-- Setting: Remove Duplicate Rows -->
-            <div class="setting-item checkbox-item">
               <label class="custom-checkbox">
                 <input type="checkbox" id="opt-remove-duplicates">
                 <span class="checkmark"></span>
-                <span class="checkbox-text">
-                  <strong>중복 행 자동 제거</strong>
-                  <small>모든 열의 내용이 완전히 일치하는 행을 1건만 남깁니다</small>
-                </span>
+                <span class="checkbox-label">중복 행 제거</span>
               </label>
-            </div>
 
-            <!-- Setting: Skip Empty Rows -->
-            <div class="setting-item checkbox-item">
               <label class="custom-checkbox">
                 <input type="checkbox" id="opt-skip-empty-rows" checked>
                 <span class="checkmark"></span>
-                <span class="checkbox-text">
-                  <strong>빈 행(공백 데이터) 건너뛰기</strong>
-                  <small>모든 셀이 비어있는 빈 행은 병합 시 제외합니다</small>
-                </span>
+                <span class="checkbox-label">빈 행 제외</span>
               </label>
-            </div>
 
-            <!-- Setting: Trim Header Whitespaces -->
-            <div class="setting-item checkbox-item">
               <label class="custom-checkbox">
                 <input type="checkbox" id="opt-trim-headers" checked>
                 <span class="checkmark"></span>
-                <span class="checkbox-text">
-                  <strong>열 이름 앞뒤 공백 무시</strong>
-                  <small>' 이름 '과 '이름'을 동일한 규격 열로 매칭합니다</small>
-                </span>
+                <span class="checkbox-label">열 이름 공백 무시</span>
               </label>
             </div>
           </div>
         </div>
+
       </section>
 
-      <!-- Step 2: Uploaded Files Management List (Collapsible / Summary) -->
-      <section class="section-card uploaded-files-section" id="uploaded-files-section" style="display: none;">
-        <div class="section-header">
-          <div class="section-title-wrap">
-            <h3><i data-lucide="files"></i> 업로드된 파일 목록</h3>
-            <span class="badge badge-neutral" id="uploaded-files-count">0개 파일</span>
+      <!-- Uploaded Files Mini Bar (Compact Chips) -->
+      <section class="section-card uploaded-chips-section" id="uploaded-files-section" style="display: none;">
+        <div class="chips-bar-header">
+          <div class="chips-title">
+            <i data-lucide="files"></i>
+            <span>업로드된 파일 (<strong id="uploaded-files-count">0</strong>개)</span>
           </div>
-          <div class="section-actions">
-            <label for="file-input-append" class="btn btn-sm btn-outline cursor-pointer">
+          <div class="chips-actions">
+            <label for="file-input-append" class="btn btn-xs btn-outline cursor-pointer" title="파일 추가">
               <i data-lucide="plus"></i>
-              <span>파일 추가</span>
+              <span>추가</span>
             </label>
             <input type="file" id="file-input-append" multiple accept=".xlsx, .xls, .csv" class="file-input-hidden">
-            
-            <button id="btn-clear-files" class="btn btn-sm btn-ghost text-danger">
+            <button id="btn-clear-files" class="btn btn-xs btn-ghost text-danger" title="전체 비우기">
               <i data-lucide="trash-2"></i>
-              <span>전체 비우기</span>
+              <span>비우기</span>
             </button>
           </div>
         </div>
-
-        <div class="file-cards-grid" id="file-cards-list">
-          <!-- Dynamically populated file cards -->
+        <div class="file-chips-scroll" id="file-cards-list">
+          <!-- Dynamically populated mini chips -->
         </div>
       </section>
 
-      <!-- Step 3: Analysis & Schema Group Result Section -->
-      <section class="section-card results-section" id="results-section" style="display: none;">
+      <!-- Results & Action Section -->
+      <section class="results-container" id="results-section" style="display: none;">
         
-        <!-- Summary Dashboard Stats -->
-        <div class="stats-banner">
-          <div class="stat-card">
-            <div class="stat-icon icon-primary"><i data-lucide="file-check-2"></i></div>
-            <div class="stat-info">
-              <span class="stat-label">분석된 파일/시트</span>
-              <span class="stat-value" id="stat-total-files">0개</span>
+        <!-- Compact Summary & Batch Action Header -->
+        <div class="summary-action-banner">
+          <div class="summary-stats-left">
+            <div class="stat-pill">
+              <i data-lucide="file-check-2" class="text-primary"></i>
+              <span class="stat-label">파일:</span>
+              <strong id="stat-total-files">0개</strong>
+            </div>
+            <div class="stat-pill">
+              <i data-lucide="git-merge" class="text-accent"></i>
+              <span class="stat-label">규격 그룹:</span>
+              <strong id="stat-total-groups">0개</strong>
+            </div>
+            <div class="stat-pill">
+              <i data-lucide="database" class="text-success"></i>
+              <span class="stat-label">총 병합 데이터:</span>
+              <strong id="stat-total-rows">0행</strong>
+            </div>
+            <div class="stat-pill stat-dedup-pill" id="stat-dedup-wrap" style="display: none;">
+              <i data-lucide="sparkles" class="text-warning"></i>
+              <span class="stat-label">중복제거:</span>
+              <strong id="stat-dedup-rows">0행</strong>
             </div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-icon icon-accent"><i data-lucide="git-merge"></i></div>
-            <div class="stat-info">
-              <span class="stat-label">감지된 규격 그룹</span>
-              <span class="stat-value" id="stat-total-groups">0개 그룹</span>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon icon-success"><i data-lucide="database"></i></div>
-            <div class="stat-info">
-              <span class="stat-label">총 병합 데이터 행</span>
-              <span class="stat-value" id="stat-total-rows">0행</span>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon icon-warning"><i data-lucide="copy-x"></i></div>
-            <div class="stat-info">
-              <span class="stat-label">제거된 중복 행</span>
-              <span class="stat-value" id="stat-dedup-rows">0행</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Global Batch Action Bar -->
-        <div class="batch-action-bar">
-          <div class="batch-title">
-            <div class="batch-badge"><i data-lucide="zap"></i> 일괄 처리</div>
-            <h4>전체 규격 일괄 다운로드</h4>
-            <p>분류된 모든 규격 그룹을 한 번의 클릭으로 손쉽게 내려받으세요</p>
-          </div>
-          <div class="batch-buttons">
-            <button id="btn-download-all-sheets" class="btn btn-primary btn-glow">
+          <div class="batch-action-right">
+            <button id="btn-download-all-sheets" class="btn btn-sm btn-primary btn-glow" title="모든 규격을 1개 엑셀 파일 내 시트별로 분리하여 저장">
               <i data-lucide="file-spreadsheet"></i>
-              <span>1개 엑셀 파일로 통합 (시트별 분리 저장)</span>
+              <span>통합 엑셀 다운로드 (시트별)</span>
             </button>
-            <button id="btn-download-all-zip" class="btn btn-secondary">
+            <button id="btn-download-all-zip" class="btn btn-sm btn-secondary" title="모든 규격별 엑셀 파일들을 ZIP으로 일괄 압축 다운로드">
               <i data-lucide="archive"></i>
-              <span>ZIP 압축 파일로 다운로드 (그룹별 엑셀)</span>
+              <span>ZIP 다운로드</span>
             </button>
           </div>
         </div>
 
-        <!-- Groups Container -->
-        <div class="groups-header-wrap">
-          <div class="groups-title">
-            <h3><i data-lucide="boxes"></i> 규격별 그룹 상세 및 병합 결과</h3>
-            <p>각 규격 그룹별로 포함된 파일 목록과 병합 데이터 미리보기를 확인하고 개별 다운로드할 수 있습니다.</p>
-          </div>
-        </div>
-
+        <!-- Schema Groups List -->
         <div class="schema-groups-list" id="schema-groups-list">
           <!-- Dynamically populated Schema Groups -->
         </div>
@@ -331,10 +249,10 @@
 
     </main>
 
-    <!-- Footer -->
+    <!-- Slim Footer -->
     <footer class="app-footer">
       <div class="footer-container">
-        <p>ExcelSchemaMerger &bull; 순수 클라이언트 사이드 웹 애플리케이션 (100% 로컬 프라이빗 안전 처리)</p>
+        <p>ExcelSchemaMerger &bull; 순수 클라이언트 웹 애플리케이션 (100% 브라우저 메모리 로컬 처리)</p>
       </div>
     </footer>
 
@@ -345,10 +263,10 @@
     <div class="modal-dialog">
       <div class="modal-header">
         <div class="modal-title-wrap">
-          <h4 id="modal-group-title">규격 그룹 데이터 상세 미리보기</h4>
+          <h4 id="modal-group-title">규격 그룹 데이터 상세</h4>
           <span class="badge badge-primary" id="modal-row-badge">0행</span>
         </div>
-        <button type="button" class="btn-icon" id="btn-close-modal" aria-label="닫기">
+        <button type="button" class="btn-icon btn-sm" id="btn-close-modal" aria-label="닫기">
           <i data-lucide="x"></i>
         </button>
       </div>
@@ -358,13 +276,13 @@
           <input type="text" id="modal-search-input" placeholder="데이터 내 실시간 검색..." />
         </div>
         <div class="modal-toolbar-actions">
-          <button id="btn-modal-copy" class="btn btn-sm btn-outline">
+          <button id="btn-modal-copy" class="btn btn-xs btn-outline">
             <i data-lucide="copy"></i>
             <span>클립보드 복사</span>
           </button>
-          <button id="btn-modal-download-xlsx" class="btn btn-sm btn-primary">
+          <button id="btn-modal-download-xlsx" class="btn btn-xs btn-primary">
             <i data-lucide="download"></i>
-            <span>이 그룹 엑셀(.xlsx) 다운로드</span>
+            <span>엑셀(.xlsx) 다운로드</span>
           </button>
         </div>
       </div>
@@ -375,7 +293,7 @@
       </div>
       <div class="modal-footer">
         <span class="preview-info" id="modal-preview-info">상위 500개 행을 표시 중입니다.</span>
-        <button type="button" class="btn btn-secondary" id="btn-modal-close-footer">닫기</button>
+        <button type="button" class="btn btn-xs btn-secondary" id="btn-modal-close-footer">닫기</button>
       </div>
     </div>
   </div>

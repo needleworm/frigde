@@ -1,5 +1,5 @@
 /**
- * app.js - 스마트 엑셀 규격별 자동 병합기 메인 컨트롤러
+ * app.js - 스마트 엑셀 규격별 자동 병합기 메인 컨트롤러 (컴팩트 고밀도 UI)
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
     statTotalGroups: document.getElementById('stat-total-groups'),
     statTotalRows: document.getElementById('stat-total-rows'),
     statDedupRows: document.getElementById('stat-dedup-rows'),
+    statDedupWrap: document.getElementById('stat-dedup-wrap'),
 
     btnDownloadAllSheets: document.getElementById('btn-download-all-sheets'),
     btnDownloadAllZip: document.getElementById('btn-download-all-zip'),
@@ -133,6 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
+    // Clicking Dropzone triggers file picker
+    elements.dropZone.addEventListener('click', (e) => {
+      if (e.target.closest('.file-input-hidden')) return;
+      elements.fileInput.click();
+    });
+
     // File Input Select
     elements.fileInput.addEventListener('change', (e) => {
       const files = Array.from(e.target.files || []);
@@ -194,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
       try {
         showToast('ZIP 압축 파일을 생성하고 있습니다...', 'info');
         await ExcelMerger.exportAllToZip(state.schemaGroups, state.options);
-        showToast('ZIP 압축 파일이 성공적으로 다운로드되었습니다.', 'success');
+        showToast('ZIP 압축 파일이 다운로드되었습니다.', 'success');
       } catch (err) {
         showToast(`ZIP 생성 실패: ${err.message}`, 'error');
       }
@@ -238,11 +245,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (append) {
-      // Append unique files
       const existingNames = new Set(state.rawFiles.map(f => f.name));
       const filtered = validFiles.filter(f => !existingNames.has(f.name));
       if (filtered.length < validFiles.length) {
-        showToast('이미 목록에 있는 중복 파일은 제외되었습니다.', 'info');
+        showToast('중복 파일은 제외되었습니다.', 'info');
       }
       state.rawFiles.push(...filtered);
     } else {
@@ -259,14 +265,14 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    showOverlay(true, '파일 분석 중...', `총 ${state.rawFiles.length}개 파일의 스키마를 판독하고 있습니다`);
+    showOverlay(true, '파일 분석 중...', `총 ${state.rawFiles.length}개 파일 판독 중`);
     
     const parsedSheets = [];
     const total = state.rawFiles.length;
 
     for (let i = 0; i < total; i++) {
       const file = state.rawFiles[i];
-      updateProgress((i / total) * 90, `${file.name} 파싱 중... (${i + 1}/${total})`);
+      updateProgress((i / total) * 90, `${file.name} (${i + 1}/${total})`);
       
       try {
         const sheets = await ExcelParser.parseFile(file, state.options);
@@ -277,18 +283,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    updateProgress(95, '규격별 자동 클러스터링 중...');
+    updateProgress(95, '규격 자동 분류 중...');
     state.parsedItems = parsedSheets;
 
     // Cluster into schema groups
     state.schemaGroups = ExcelParser.clusterBySchema(parsedSheets, state.options);
 
-    updateProgress(100, '완료!');
+    updateProgress(100, '완료');
     setTimeout(() => {
       showOverlay(false);
       renderUI();
-      showToast(`총 ${state.parsedItems.length}개 파일/시트가 ${state.schemaGroups.length}개의 규격 그룹으로 분류되었습니다.`, 'success');
-    }, 250);
+      showToast(`총 ${state.parsedItems.length}개 파일이 ${state.schemaGroups.length}개 규격 그룹으로 분류되었습니다.`, 'success');
+    }, 200);
   }
 
   function readOptionsFromUI() {
@@ -308,16 +314,15 @@ document.addEventListener('DOMContentLoaded', () => {
      UI Rendering
      ========================================================================== */
   function renderUI() {
-    // Show/Hide sections
     const hasFiles = state.rawFiles.length > 0;
     elements.uploadedFilesSection.style.display = hasFiles ? 'block' : 'none';
-    elements.resultsSection.style.display = hasFiles ? 'block' : 'none';
+    elements.resultsSection.style.display = hasFiles ? 'flex' : 'none';
     elements.resetAllBtn.style.display = hasFiles ? 'inline-flex' : 'none';
 
     if (!hasFiles) return;
 
     // Render Uploaded Files Count & Chips
-    elements.uploadedFilesCount.textContent = `${state.rawFiles.length}개 파일`;
+    elements.uploadedFilesCount.textContent = state.rawFiles.length;
     renderUploadedFileCards();
 
     // Calculate Global Statistics
@@ -333,7 +338,13 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.statTotalFiles.textContent = `${state.parsedItems.length}개`;
     elements.statTotalGroups.textContent = `${state.schemaGroups.length}개 그룹`;
     elements.statTotalRows.textContent = `${totalMergedRows.toLocaleString()}행`;
-    elements.statDedupRows.textContent = `${totalDedupRows.toLocaleString()}행`;
+    
+    if (totalDedupRows > 0) {
+      elements.statDedupWrap.style.display = 'inline-flex';
+      elements.statDedupRows.textContent = `${totalDedupRows.toLocaleString()}행`;
+    } else {
+      elements.statDedupWrap.style.display = 'none';
+    }
 
     // Render Schema Groups
     renderSchemaGroups();
@@ -348,37 +359,26 @@ document.addEventListener('DOMContentLoaded', () => {
     elements.fileCardsList.innerHTML = '';
 
     state.rawFiles.forEach((file, index) => {
-      const card = document.createElement('div');
-      card.className = 'file-card';
+      const chip = document.createElement('div');
+      chip.className = 'file-card-mini';
 
       const ext = file.name.split('.').pop().toUpperCase();
       const sizeStr = formatFileSize(file.size);
 
-      card.innerHTML = `
-        <div class="file-card-info">
-          <div class="file-card-icon">
-            <i data-lucide="file-spreadsheet"></i>
-          </div>
-          <div class="file-card-texts">
-            <div class="file-card-name" title="${file.name}">${file.name}</div>
-            <div class="file-card-meta">
-              <span>${ext}</span>
-              <span>&bull;</span>
-              <span>${sizeStr}</span>
-            </div>
-          </div>
-        </div>
-        <button class="file-card-delete" title="이 파일 제거" data-index="${index}">
+      chip.innerHTML = `
+        <span class="file-name" title="${file.name} (${ext}, ${sizeStr})">${file.name}</span>
+        <span class="file-size">${sizeStr}</span>
+        <button class="file-mini-del" title="삭제" data-index="${index}">
           <i data-lucide="x"></i>
         </button>
       `;
 
-      card.querySelector('.file-card-delete').addEventListener('click', (e) => {
+      chip.querySelector('.file-mini-del').addEventListener('click', (e) => {
         e.stopPropagation();
         deleteFileByIndex(index);
       });
 
-      elements.fileCardsList.appendChild(card);
+      elements.fileCardsList.appendChild(chip);
     });
   }
 
@@ -396,8 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (state.schemaGroups.length === 0) {
       elements.schemaGroupsList.innerHTML = `
-        <div class="group-card" style="padding: 2.5rem; text-align: center; color: var(--text-muted);">
-          <i data-lucide="alert-circle" style="width: 36px; height: 36px; margin-bottom: 0.5rem;"></i>
+        <div class="group-card" style="padding: 1.5rem; text-align: center; color: var(--text-muted);">
           <p>감지된 유효한 엑셀 데이터 규격이 없습니다.</p>
         </div>
       `;
@@ -410,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const groupCard = document.createElement('div');
       groupCard.className = 'group-card';
 
-      // Header HTML
+      // Header HTML - Compact
       const headerHTML = `
         <div class="group-header">
           <div class="group-title-left">
@@ -419,24 +418,23 @@ document.addEventListener('DOMContentLoaded', () => {
               <h4>${group.groupName}</h4>
             </div>
             <div class="group-badges">
-              <span class="badge badge-primary"><i data-lucide="files"></i> ${group.files.length}개 파일</span>
-              <span class="badge badge-neutral"><i data-lucide="table"></i> ${group.masterHeaders.length}개 컬럼</span>
-              <span class="badge badge-neutral"><i data-lucide="database"></i> 병합 ${merged.totalRows.toLocaleString()}행</span>
-              ${merged.deduplicatedCount > 0 ? `<span class="badge badge-privacy"><i data-lucide="sparkles"></i> 중복제거 ${merged.deduplicatedCount}행</span>` : ''}
+              <span class="badge badge-primary">${group.files.length}개 파일</span>
+              <span class="badge badge-neutral">${group.masterHeaders.length}개 열</span>
+              <span class="badge badge-neutral">병합 ${merged.totalRows.toLocaleString()}행</span>
+              ${merged.deduplicatedCount > 0 ? `<span class="badge badge-privacy">중복제거 ${merged.deduplicatedCount}행</span>` : ''}
             </div>
           </div>
           <div class="group-actions">
-            <button class="btn btn-sm btn-outline btn-open-modal" data-group-id="${group.groupId}">
-              <i data-lucide="maximize-2"></i>
-              <span>데이터 전체보기</span>
-            </button>
-            <button class="btn btn-sm btn-primary btn-download-group-xlsx" data-group-id="${group.groupId}">
+            <button class="btn btn-xs btn-primary btn-download-group-xlsx" data-group-id="${group.groupId}" title="이 규격 데이터만 엑셀로 다운로드">
               <i data-lucide="download"></i>
-              <span>엑셀(.xlsx) 저장</span>
+              <span>엑셀(.xlsx)</span>
             </button>
-            <button class="btn btn-sm btn-secondary btn-download-group-csv" data-group-id="${group.groupId}">
-              <i data-lucide="file-text"></i>
-              <span>CSV 저장</span>
+            <button class="btn btn-xs btn-secondary btn-download-group-csv" data-group-id="${group.groupId}" title="CSV 파일로 다운로드">
+              <span>CSV</span>
+            </button>
+            <button class="btn btn-xs btn-outline btn-open-modal" data-group-id="${group.groupId}" title="전체 데이터 검색 및 확인">
+              <i data-lucide="maximize-2"></i>
+              <span>미리보기</span>
             </button>
           </div>
         </div>
@@ -450,20 +448,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const columnsBarHTML = `
         <div class="group-columns-bar">
-          <span class="group-columns-label"><i data-lucide="columns"></i> 일치 열 목록:</span>
+          <span class="group-columns-label">열 목록:</span>
           <div class="columns-tag-list">${tagsHTML}</div>
         </div>
       `;
 
       // Included Files Mini List
       const filesChipsHTML = group.files.map(f => {
-        return `<span class="file-chip"><i data-lucide="file-check"></i> ${f.fileName} <span class="file-chip-rows">(${f.rowCount.toLocaleString()}행)</span></span>`;
+        return `<span class="file-chip">${f.fileName} <span class="file-chip-rows">(${f.rowCount.toLocaleString()}행)</span></span>`;
       }).join('');
 
       const filesBarHTML = `
         <div class="group-files-bar">
           <div class="group-files-chips">
-            <strong style="color: var(--text-dim); margin-right: 0.3rem;"><i data-lucide="corner-down-right"></i> 포함된 파일:</strong>
+            <strong style="color: var(--text-dim); margin-right: 0.2rem;">포함 파일:</strong>
             ${filesChipsHTML}
           </div>
         </div>
@@ -483,8 +481,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const previewBodyHTML = `
         <div class="group-preview-body">
           <div class="preview-table-header">
-            <span class="preview-table-title"><i data-lucide="eye"></i> 병합 데이터 실시간 미리보기 (상위 ${previewRows.length}행)</span>
-            ${merged.rows.length > 5 ? `<span style="font-size: 0.78rem; color: var(--text-dim);">외 ${(merged.rows.length - 5).toLocaleString()}개 행 생략됨</span>` : ''}
+            <span class="preview-table-title">데이터 미리보기 (상위 ${previewRows.length}행)</span>
+            ${merged.rows.length > 5 ? `<span style="font-size: 0.72rem; color: var(--text-dim);">외 ${(merged.rows.length - 5).toLocaleString()}개 행</span>` : ''}
           </div>
           <div class="table-responsive">
             <table class="data-table">
@@ -530,7 +528,7 @@ document.addEventListener('DOMContentLoaded', () => {
     state.modalFilterText = '';
     elements.modalSearchInput.value = '';
 
-    elements.modalGroupTitle.textContent = `${group.groupName} 상세 데이터 미리보기`;
+    elements.modalGroupTitle.textContent = `${group.groupName}`;
     elements.previewModal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 
@@ -558,13 +556,13 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    elements.modalRowBadge.textContent = `총 ${rows.length.toLocaleString()}행 표시`;
+    elements.modalRowBadge.textContent = `${rows.length.toLocaleString()}행`;
 
     const displayLimit = 500;
     const limitedRows = rows.slice(0, displayLimit);
     elements.modalPreviewInfo.textContent = rows.length > displayLimit 
-      ? `검색 결과 ${rows.length.toLocaleString()}행 중 상위 ${displayLimit}행을 표시 중입니다.` 
-      : `총 ${rows.length.toLocaleString()}행의 데이터를 표시 중입니다.`;
+      ? `검색 결과 ${rows.length.toLocaleString()}행 중 상위 ${displayLimit}행 표시 중` 
+      : `총 ${rows.length.toLocaleString()}행 표시 중`;
 
     const tableRowsHTML = limitedRows.map(row => {
       const cellsHTML = merged.headers.map(h => {
@@ -583,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </tr>
         </thead>
         <tbody>
-          ${tableRowsHTML.length > 0 ? tableRowsHTML : `<tr><td colspan="${merged.headers.length}" style="text-align: center; padding: 2rem; color: var(--text-dim);">검색 조건에 맞는 데이터가 없습니다.</td></tr>`}
+          ${tableRowsHTML.length > 0 ? tableRowsHTML : `<tr><td colspan="${merged.headers.length}" style="text-align: center; padding: 1.5rem; color: var(--text-dim);">검색 결과가 없습니다.</td></tr>`}
         </tbody>
       </table>
     `;
@@ -599,7 +597,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!state.modalGroup) return;
     const merged = ExcelMerger.mergeGroupData(state.modalGroup, state.options);
     
-    // Convert to TSV (Tab Separated Values) for easy pasting into Excel / Sheets
     const lines = [];
     lines.push(merged.headers.join('\t'));
     merged.rows.forEach(row => {
@@ -608,9 +605,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     navigator.clipboard.writeText(lines.join('\n')).then(() => {
-      showToast('클립보드에 복사되었습니다. 엑셀이나 스프레드시트에 바로 붙여넣기(Ctrl+V)하세요!', 'success');
+      showToast('클립보드에 복사되었습니다 (Ctrl+V로 붙여넣기 가능).', 'success');
     }).catch(err => {
-      showToast('클립보드 복사 실패: ' + err.message, 'error');
+      showToast('복사 실패: ' + err.message, 'error');
     });
   }
 
@@ -618,7 +615,7 @@ document.addEventListener('DOMContentLoaded', () => {
      Sample Demo Data Generator
      ========================================================================== */
   function loadSampleDemoData() {
-    showOverlay(true, '샘플 데이터 생성 중...', '규격이 다른 테스트용 가상 엑셀 파일들을 준비하고 있습니다');
+    showOverlay(true, '샘플 데이터 로드 중...', '가상 엑셀 파일 5개 생성 중');
 
     setTimeout(() => {
       try {
@@ -632,7 +629,6 @@ document.addEventListener('DOMContentLoaded', () => {
         ]);
 
         const schema1File2 = createMockExcelFile('2026_1분기_지방권_고객명단.xlsx', [
-          // Different column order: 전화번호, 이름, 거주지역, 가입일자, 이메일
           ['전화번호', '이름', '거주지역', '가입일자', '이메일'],
           ['010-5678-9012', '정도윤', '부산 해운대구', '2026-01-20', 'doyun@example.com'],
           ['010-6789-0123', '한예은', '대전 유성구', '2026-02-18', 'yeeun@example.com'],
@@ -669,7 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showOverlay(false);
         showToast('샘플 생성 오류: ' + err.message, 'error');
       }
-    }, 300);
+    }, 200);
   }
 
   function createMockExcelFile(fileName, dataAOA) {
@@ -696,14 +692,14 @@ document.addEventListener('DOMContentLoaded', () => {
     state.parsedItems = [];
     state.schemaGroups = [];
     renderUI();
-    showToast('모든 업로드 파일 및 결과가 초기화되었습니다.', 'info');
+    showToast('전체 초기화되었습니다.', 'info');
   }
 
   function toggleSettingsAccordion() {
     const isHidden = elements.settingsContent.style.display === 'none';
     elements.settingsContent.style.display = isHidden ? 'grid' : 'none';
-    elements.settingsToggleText.textContent = isHidden ? '상세 옵션 접기' : '상세 옵션 펼치기';
-    elements.settingsChevron.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
+    elements.settingsToggleText.textContent = isHidden ? '설정 접기' : '설정 펼치기';
+    elements.settingsChevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
   }
 
   function showOverlay(show, title = '', desc = '') {
@@ -740,14 +736,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTimeout(() => {
       toast.style.opacity = '0';
-      toast.style.transform = 'translateX(100%)';
-      toast.style.transition = 'all 0.3s ease';
+      toast.style.transform = 'translateY(10px)';
+      toast.style.transition = 'all 0.25s ease';
       setTimeout(() => {
         if (toast.parentNode) {
           toast.parentNode.removeChild(toast);
         }
-      }, 300);
-    }, 3500);
+      }, 250);
+    }, 3000);
   }
 
   function formatFileSize(bytes) {
